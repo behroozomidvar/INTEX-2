@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>INTEX Review Exploration</title>
+    <!-- development version, includes helpful console warnings -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
+        integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+            <a class="navbar-brand" href="#">INTEX</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="collapsibleNavbar">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="static/about.html">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+
+        <div v-if="started" class="container" style="margin-top:30px">
+            <div class="row">
+                <div class="col-sm-12">
+
+                    <h3>Iteration <mark>{{ iteration }}</mark> of the exploration session <mark>{{ sessionName
+                            }}</mark></h3><br />
+
+                    <p><i class="fas fa-chevron-circle-right"></i> You can directly go to <a href="#top_guidance">output
+                            elements</a> and <a href="#questions">exploration options</a>.</p>
+
+                    <div class="card" v-if="inputElement">
+
+                        <div class="card-header">
+                            <b>Input element</b> ({{inputElement.type}} {{ inputElement.id }})
+                        </div>
+
+                        <div class="card-body">
+                            <div class="container">
+                                <div class="row">
+
+                                    <div class="col-md-2 text-center align-middle">
+                                        <i :class="elementIconClasses(inputElement)"></i>
+                                    </div>
+                                    <div v-if="inputElement.type == 'review'" class="col-md-10">
+                                        <template v-if="datasetName=='amazon'">
+                                            <p><i class="fas fa-box"></i> <b>Product name:</b> {{
+                                                inputElement.item.attributes["title"] }}</p>
+                                            <p><i class="fas fa-dollar-sign"></i> <b>Price:</b> {{
+                                                inputElement.item.attributes["price"] }}</p>
+                                            <p><i class="fas fa-tag"></i> <b>Main category:</b> {{
+                                                inputElement.item.attributes["main_cat"] }}</p>
+                                            <p><i class="fas fa-tags"></i> <b>Categories:</b> {{
+                                                inputElement.item.attributes["categories"].join(', ')}}</p>
+                                        </template>
+                                        <template v-else>
+                                            <p><i class="fas fa-box"></i> <b>Movie title:</b> {{
+                                                inputElement.item.attributes["title"] }}</p>
+                                            <p><i class="fas fa-calendar-check"></i> <b>Release year:</b> {{
+                                                inputElement.item.attributes["release"]}}</p>
+                                            <p><i class="fas fa-palette"></i> <b>Genres:</b> {{
+                                                inputElement.item.attributes["genres"].join(', ')}}</p>
+                                            <p><i class="fas fa-user-secret"></i> <b>Director:</b> {{
+                                                inputElement.item.attributes["director"] }}</p>
+                                            <p><i class="fas fa-user-friends"></i> <b>Cast:</b> {{
+                                                inputElement.item.attributes["actors"].join(', ')}}</p>
+                                        </template>
+                                    </div>
+                                    <div v-else class="col-md-10">
+                                        <template v-if="datasetName=='amazon'">
+                                            <p><i class="fas fa-box"></i> <b>Product name:</b> {{
+                                                inputElement.attributes["title"] }}</p>
+                                            <p><i class="fas fa-dollar-sign"></i> <b>Price:</b> {{
+                                                inputElement.attributes["price"] }}</p>
+                                            <p><i class="fas fa-tag"></i> <b>Main category:</b> {{
+                                                inputElement.attributes["main_cat"] }}</p>
+                                            <p><i class="fas fa-tags"></i> <b>Categories:</b> {{
+                                                inputElement.attributes["categories"].join(', ')}}</p>
+                                        </template>
+                                        <template v-else>
+                                            <p><i class="fas fa-box"></i> <b>Movie title:</b> {{
+                                                inputElement.attributes["title"] }}</p>
+                                            <p><i class="fas fa-calendar-check"></i> <b>Release year:</b> {{
+                                                inputElement.attributes["release"]}}</p>
+                                            <p><i class="fas fa-palette"></i> <b>Genres:</b> {{
+                                                inputElement.attributes["genres"].join(', ')}}</p>
+                                            <p><i class="fas fa-user-secret"></i> <b>Director:</b> {{
+                                                inputElement.attributes["director"] }}</p>
+                                            <p><i class="fas fa-user-friends"></i> <b>Cast:</b> {{
+                                                inputElement.attributes["actors"].join(', ')}}</p>
+                                        </template>
+                                    </div>
+                                </div>
+                                <hr />
+                                <p v-if='inputElement.type == "review" && "reviewername" in inputElement.attributes'><i
+                                        class="fas fa-user"></i> <b>reviewer:</b> {{
+                                    inputElement.attributes["reviewername"] }}</p>
+                                <p><i class="fas fa-tags"></i> <b>{{inputElement.type}} rating:</b> {{
+                                    Math.round(inputElement.rating * 100) /
+                                    100 }}</p>
+
+                                <p><i class="fas fa-fast-forward"></i> <b>{{inputElement.type}} summary:</b> "{{
+                                    inputElement.summary }}"</p>
+
+                                <p><i class="fas fa-quote-left"></i> <b>{{inputElement.type}} text:</b> {{
+                                    inputElement.text.replace('[', '').replace(']',
+                                    '').substring(0, 100) }} ..." <a href="" data-toggle="modal"
+                                        data-target="#input-element-review-modal">(full text and
+                                        tags)</a></p>
+
+                                <!-- modal -->
+                                <div class="modal fade" id="input-element-review-modal" tabindex="-1" role="dialog"
+                                    aria-labelledby="input-element-review-modal-title" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="input-element-review-modal-title">
+                                                    {{inputElement.type}} {{ inputElement.id }}</h5>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                    aria-label="Hide">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>{{ inputElement.text.replace('[', '').replace(']',
+                                                    '') }}</p>
+                                                <p><i class="fas fa-hashtag"></i> <b>Important parts of text
+                                                        (auto-generated tags):</b> <br />
+                                                    <template v-for="tag in inputElement.tags">
+                                                        <mark>{{ tag }}</mark>&nbsp;
+                                                    </template>
+                                                </p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-dismiss="modal">Hide</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+
+                                <table class="table table-bordered">
+                                    <caption>Sentiment polarization for {{inputElement.type}} {{ inputElement.id }}.
+                                        Maximum value is highlighted in green.</caption>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" class="text-center"><i class="fas fa-thumbs-down"></i>
+                                                <i class="fas fa-thumbs-down"></i>
+                                            </th>
+                                            <th scope="col" class="text-center"><i class="fas fa-thumbs-down"></i>
+                                            </th>
+                                            <th scope="col" class="text-center"><i class="fas fa-meh"></i></th>
+                                            <th scope="col" class="text-center"><i class="fas fa-thumbs-up"></i>
+                                            </th>
+                                            <th scope="col" class="text-center"><i class="fas fa-thumbs-up"></i> <i
+                                                    class="fas fa-thumbs-up"></i></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <template v-for="value in formattedSentiments(inputElement.sentiments)">
+                                                <td v-if="value == _.max(formattedSentiments(inputElement.sentiments))"
+                                                    class="text-success text-center"><b>{{ value }}</b>
+                                                </td>
+                                                <td v-else class="text-center">{{ value }}</td>
+                                            </template>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table table-bordered">
+                                    <caption>Topic distribution for {{inputElement.type}} {{ inputElement.id }}.
+                                        Maximum
+                                        value is highlighted in green.</caption>
+                                    <thead>
+                                        <tr>
+                                            <template v-for="topicIndex in 10">
+                                                <th scope="col" class="text-center"><a href="" data-toggle="modal"
+                                                        :data-target="'#topic-'+topicIndex+'-definition-modal'">Topic
+                                                        {{ topicIndex }}</a></th>
+
+
+                                            </template>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <template v-for="value in formattedTopics(inputElement.topics)">
+                                                <td v-if="value == _.max(formattedTopics(inputElement.topics))"
+                                                    class="text-success text-center"><b>{{ value }}</b>
+                                                </td>
+                                                <td v-else class="text-center">{{ value }}</td>
+                                            </template>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <template v-for="topicIndex in 10">
+                                    <!-- topic definition modal -->
+                                    <div class="modal fade" :id="'topic-'+topicIndex+'-definition-modal'" tabindex="-1"
+                                        role="dialog" :aria-labelledby="'topic-'+topicIndex+'-definition-modal-title'"
+                                        aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title"
+                                                        :id="'topic-'+topicIndex+'-definition-modal-title'">
+                                                        The definition
+                                                        of topic {{ topicIndex }}</h5>
+                                                    <button type="button" class="close" data-dismiss="modal"
+                                                        aria-label="Hide">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Top relevant words to topic {{ topicIndex }} are as
+                                                        follows:<br /><br />
+                                                        {{topicDefinitions[topicIndex-1]
+                                                        }}</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-dismiss="modal">Hide</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+                    <a name="top_guidance"></a>
+                    <p class="h4">Output elements</p>
+                    <p>List of output elements:
+                        <template v-for="element in outputElements">
+                            <a :href="'#rev'+element.id">{{ element.id }}</a>&nbsp;
+                        </template>
+                    </p>
+                    <template v-for="element in outputElements">
+                        <a :id="'rev'+element.id"></a>
+                        <div class="card">
+
+                            <div class="card-header">
+                                <b><i class="fas fa-location-arrow"></i> Output element {{
+                                    outputElements.indexOf(element)+1 }}</b> ({{element.type}} {{ element.id
+                                }}) <a href="#top_guidance">(return to top)</a>
+                            </div>
+
+                            <div class="card-body">
+
+                                <template v-if="iteration > 1">
+                                    <p><i class="fas fa-question-circle"></i> <a href="" data-toggle="modal"
+                                            :data-target="'#guidance-'+element.id+'-explanation-modal'">Why do I see
+                                            this
+                                            output
+                                            element?</a></p>
+
+                                    <div class="modal fade" :id="'guidance-'+element.id+'-explanation-modal'"
+                                        tabindex="-1" role="dialog"
+                                        :aria-labelledby="'#guidance-'+element.id+'-explanation-modal-title'"
+                                        aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title"
+                                                        id="'guidance-'+element.id+'-explanation-modal-title'">Why
+                                                        {{element.type}} {{ element.id
+                                                        }} as an output element?</h5>
+                                                    <button type="button" class="close" data-dismiss="modal"
+                                                        aria-label="Hide">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>
+                                                        In iteration {{ iteration }}, the output elements are picked
+                                                        among
+                                                        the most similar elements <b>in their {{
+                                                            previousOutputElementsMarkers[0] }}</b>, including
+                                                        {{element.type}} {{ element.id
+                                                        }}.
+                                                        <template v-if="previousOutputElementsMarkers[1] == 'none'">
+                                                            The <b>top-{{ len(output_elements) }} most similar</b>
+                                                            elements
+                                                            are
+                                                            returned.
+                                                        </template>
+                                                        <template
+                                                            v-else-if="previousOutputElementsMarkers[1] == 'diverse_numerical'">
+                                                            Moreover, the output elements are selected in a way that
+                                                            their
+                                                            <b>element ratings</b> are maximally <b>diverse</b>.
+                                                        </template>
+                                                        <template
+                                                            v-else-if="previousOutputElementsMarkers[1] == 'diverse_review'">
+                                                            Moreover, the output elements are selected in a way that
+                                                            their
+                                                            <b>element contexts</b> (phrases and words) are maximally
+                                                            <b>diverse</b>.
+                                                        </template>
+                                                        <template
+                                                            v-else-if="previousOutputElementsMarkers[1] == 'coverage_review'">
+                                                            Moreover, the output elements are selected in a way that
+                                                            their
+                                                            review contexts cover maximum number of words collectively.
+                                                        </template>
+
+                                                    </p>
+                                                    <template v-if="previousOutputElementsMarkers[0] == 'topics'">
+                                                        <p>Here is the comparison of the topic distributions.</p>
+
+                                                        <table class="table table-bordered">
+                                                            <caption>Topic distribution for the {{inputElement.type}} {{
+                                                                inputElement.id
+                                                                }} (the input element) and {{element.type}} {{
+                                                                element.id
+                                                                }}.
+                                                                Maximum values are highlighted in green.</caption>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th></th>
+                                                                    <template v-for="topicIndex in 10">
+                                                                        <th scope="col" class="text-center"><a href=""
+                                                                                data-toggle="modal"
+                                                                                :data-target="'#topic-'+topicIndex+'-definition-modal'">Topic
+                                                                                {{ topicIndex }}</a></th>
+                                                                    </template>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td><b>The input element</b></td>
+                                                                    <template
+                                                                        v-for="value in formattedTopics(inputElement.topics)">
+                                                                        <td v-if="value == _.max(formattedTopics(inputElement.topics))"
+                                                                            class="text-success text-center"><b>{{ value
+                                                                                }}</b>
+                                                                        </td>
+                                                                        <td v-else class="text-center">{{ value }}</td>
+                                                                    </template>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td><b>Output element</b></td>
+                                                                    <template
+                                                                        v-for="value in formattedTopics(element.topics)">
+                                                                        <td v-if="value == _.max(formattedTopics(element.topics))"
+                                                                            class="text-success text-center"><b>{{ value
+                                                                                }}</b>
+                                                                        </td>
+                                                                        <td v-else class="text-center">{{ value }}</td>
+                                                                    </template>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+
+                                                        <p>(how are topics computed?)</p>
+                                                    </template>
+                                                    <template
+                                                        v-else-if="previousOutputElementsMarkers[0] == 'sentiments'">
+                                                        <p>Here is the comparison of the sentiments.</p>
+
+                                                        <table class="table table-bordered">
+                                                            <caption>Sentiment polarization for the
+                                                                {{inputElement.type}} {{
+                                                                inputElement.id
+                                                                }} (the input element) and {{element.type}} {{
+                                                                element.id
+                                                                }}.
+                                                                Maximum values are highlighted in green.</caption>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th></th>
+                                                                    <th scope="col" class="text-center"><i
+                                                                            class="fas fa-thumbs-down"></i> <i
+                                                                            class="fas fa-thumbs-down"></i></th>
+                                                                    <th scope="col" class="text-center"><i
+                                                                            class="fas fa-thumbs-down"></i></th>
+                                                                    <th scope="col" class="text-center"><i
+                                                                            class="fas fa-meh"></i></th>
+                                                                    <th scope="col" class="text-center"><i
+                                                                            class="fas fa-thumbs-up"></i></th>
+                                                                    <th scope="col" class="text-center"><i
+                                                                            class="fas fa-thumbs-up"></i> <i
+                                                                            class="fas fa-thumbs-up"></i></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td><b>Input element</b></td>
+                                                                    <template
+                                                                        v-for="value in formattedSentiments(inputElement.sentiments)">
+                                                                        <td v-if="value == _.max(formattedSentiments(inputElement.sentiments))"
+                                                                            class="text-success text-center"><b>{{ value
+                                                                                }}</b>
+                                                                        </td>
+                                                                        <td v-else class="text-center">{{ value }}</td>
+                                                                    </template>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td><b>Output element</b></td>
+                                                                    <template
+                                                                        v-for="value in formattedSentiments(element.sentiments)">
+                                                                        <td v-if="value == _.max(formattedSentiments(element.sentiments))"
+                                                                            class="text-success text-center"><b>{{ value
+                                                                                }}</b>
+                                                                        </td>
+                                                                        <td v-else class="text-center">{{ value }}</td>
+                                                                    </template>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+
+                                                        <p>(how are sentiments computed?)</p>
+                                                    </template>
+
+                                                    <template v-else-if="previousOutputElementsMarkers[0] == 'summary'">
+                                                        <p>Here are the summaries side-by-side.</p>
+                                                        <p><i class="fas fa-fast-forward"></i> <b>Summary of the input
+                                                                element:</b> {{ inputElement.summary }}</p>
+                                                        <p><i class="fas fa-fast-forward"></i> <b>Summary of output
+                                                                element:</b> {{ element.summary }}</p>
+                                                        <p>(how are summaries compared together?)</p>
+                                                    </template>
+
+                                                    <template
+                                                        v-else-if="previousOutputElementsMarkers[0] == 'auto-generated tags'">
+                                                        <p>Here are the tags side-by-side.</p>
+                                                        <p><i class="fas fa-hashtag"></i> <b>Tags for the input
+                                                                element:</b>
+                                                            <template v-for="tag in inputElement.tags">
+                                                                <mark>{{ tag }}</mark>&nbsp;
+                                                            </template>
+                                                        </p>
+                                                        <p><i class="fas fa-hashtag"></i> <b>Tags for the output
+                                                                element:</b>
+                                                            <template v-for="tag in element.tags">
+                                                                <mark>{{ tag }}</mark>&nbsp;
+                                                            </template>
+                                                        </p>
+                                                        <p>(how are tags computed and compared?)</p>
+                                                    </template>
+
+
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-dismiss="modal">Hide</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr />
+
+                                </template>
+                                <div class="container">
+                                    <div class="row">
+
+                                        <div class="col-md-2 text-center">
+                                            <i :class="elementIconClasses(element)"></i>
+                                        </div>
+                                        <div v-if="element.type == 'review'" class="col-md-10">
+                                            <template v-if="datasetName=='amazon'">
+                                                <p><i class="fas fa-box"></i> <b>Product name:</b> {{
+                                                    element.item.attributes["title"] }}</p>
+                                                <p><i class="fas fa-dollar-sign"></i> <b>Price:</b> {{
+                                                    element.item.attributes["price"] }}</p>
+                                                <p><i class="fas fa-tag"></i> <b>Main category:</b> {{
+                                                    element.item.attributes["main_cat"] }}</p>
+                                                <p><i class="fas fa-tags"></i> <b>Categories:</b> {{
+                                                    element.item.attributes["categories"].join(', ')}}</p>
+                                            </template>
+                                            <template v-else>
+                                                <p><i class="fas fa-box"></i> <b>Movie title:</b> {{
+                                                    element.item.attributes["title"] }}</p>
+                                                <p><i class="fas fa-calendar-check"></i> <b>Release year:</b> {{
+                                                    element.item.attributes["release"]}}</p>
+                                                <p><i class="fas fa-palette"></i> <b>Genres:</b> {{
+                                                    element.item.attributes["genres"].join(', ')}}</p>
+                                                <p><i class="fas fa-user-secret"></i> <b>Director:</b> {{
+                                                    element.item.attributes["director"] }}</p>
+                                                <p><i class="fas fa-user-friends"></i> <b>Cast:</b> {{
+                                                    element.item.attributes["actors"].join(', ')}}</p>
+                                            </template>
+                                        </div>
+                                        <div v-else class="col-md-10">
+                                            <template v-if="datasetName=='amazon'">
+                                                <p><i class="fas fa-box"></i> <b>Product name:</b> {{
+                                                    element.attributes["title"] }}</p>
+                                                <p><i class="fas fa-dollar-sign"></i> <b>Price:</b> {{
+                                                    element.attributes["price"] }}</p>
+                                                <p><i class="fas fa-tag"></i> <b>Main category:</b> {{
+                                                    element.attributes["main_cat"] }}</p>
+                                                <p><i class="fas fa-tags"></i> <b>Categories:</b> {{
+                                                    element.attributes["categories"].join(', ')}}</p>
+                                            </template>
+                                            <template v-else>
+                                                <p><i class="fas fa-box"></i> <b>Movie title:</b> {{
+                                                    element.attributes["title"] }}</p>
+                                                <p><i class="fas fa-calendar-check"></i> <b>Release year:</b> {{
+                                                    element.attributes["release"]}}</p>
+                                                <p><i class="fas fa-palette"></i> <b>Genres:</b> {{
+                                                    element.attributes["genres"].join(', ')}}</p>
+                                                <p><i class="fas fa-user-secret"></i> <b>Director:</b> {{
+                                                    element.attributes["director"] }}</p>
+                                                <p><i class="fas fa-user-friends"></i> <b>Cast:</b> {{
+                                                    element.attributes["actors"].join(', ')}}</p>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <hr />
+                                <p v-if='element.type == "review" && "reviewername" in element.attributes'><i
+                                        class="fas fa-user"></i> <b>reviewer:</b> {{
+                                    element.attributes["reviewername"] }}</p>
+                                <p><i class="fas fa-tags"></i> <b>{{element.type}} rating:</b> {{
+                                    Math.round(element.rating * 100) /
+                                    100 }}</p>
+                                <p><i class="fas fa-fast-forward"></i> <b>{{element.type}} summary:</b> "{{
+                                    element.summary }}"</p>
+                                <p><i class="fas fa-quote-left"></i> <b>{{element.type}} text:</b> {{
+                                    element.text.replace('[', '').replace(']',
+                                    '').substring(0, 100) }} ..." <a href="" data-toggle="modal"
+                                        :data-target="'#input-element'+element.id+'-review-modal'">(full text and
+                                        tags)</a></p>
+
+                                <!-- modal -->
+                                <div class="modal fade" :id="'input-element'+element.id+'-review-modal'" tabindex="-1"
+                                    role="dialog" aria-labelledby="input-element-review-modal-title" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="input-element-review-modal-title">
+                                                    {{element.type}} {{ element.id }}</h5>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                    aria-label="Hide">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>{{ element.text.replace('[', '').replace(']',
+                                                    '') }}</p>
+                                                <p><i class="fas fa-hashtag"></i> <b>Important parts of text
+                                                        (auto-generated tags):</b> <br />
+
+                                                    <template v-for="tag in element.tags">
+                                                        <mark>{{ tag }}</mark>&nbsp;
+                                                    </template>
+
+                                                </p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-dismiss="modal">Hide</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <p><i class="fas fa-gifts"></i> <b>Reward information: </b> An average reward of {{
+                                    element.reward.mean_reward }} is obtained. <a href="" data-toggle="modal"
+                                        :data-target="'#reward-modal-'+element.id">(see reward details)</a></p>
+
+                                <!-- modal -->
+                                <div class="modal fade" :id="'reward-modal-'+element.id" tabindex="-1" role="dialog"
+                                    :aria-labelledby="'reward-modal-'+element.id" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="reward-modal-title">Reward details</h5>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                    aria-label="Hide">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <table class="table table-bordered">
+                                                    <caption>Reward details. Target is considered to be review <b>{{
+                                                            element.reward.target }}</b>.</caption>
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col" class="text-center">Text reward</th>
+                                                            <th scope="col" class="text-center">Summary reward</th>
+                                                            <th scope="col" class="text-center">Sentiment reward
+                                                            </th>
+                                                            <th scope="col" class="text-center">Tag reward</th>
+                                                            <th scope="col" class="text-center">Mean reward</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="text-center">{{ element.reward.text_reward }}
+                                                            </td>
+                                                            <td class="text-center">{{ element.reward.summary_reward }}
+                                                            </td>
+                                                            <td class="text-center">{{ element.reward.sentiment_reward
+                                                                }}
+                                                            </td>
+                                                            <td class="text-center">{{ element.reward.tag_reward }}</td>
+                                                            <td class="text-center">{{ element.reward.mean_reward }}
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <p>It is to note that it is of high importance to consider the
+                                                    reward
+                                                    value in different dimensions, because a poorly specified reward
+                                                    may
+                                                    lead to counter-intuitive performance. [1]</p>
+                                                <p>
+                                                    [1] Tova Milo and Amit Somech. "Next-step suggestions for modern
+                                                    interactive data analysis platforms." KDD 2018.
+                                                </p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-dismiss="modal">Hide</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <table class="table table-bordered">
+                                    <caption>Sentiment polarization for {{element.type}} {{ element.id }}.
+                                        Maximum value is highlighted in green.</caption>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" class="text-center"><i class="fas fa-thumbs-down"></i>
+                                                <i class="fas fa-thumbs-down"></i>
+                                            </th>
+                                            <th scope="col" class="text-center"><i class="fas fa-thumbs-down"></i>
+                                            </th>
+                                            <th scope="col" class="text-center"><i class="fas fa-meh"></i></th>
+                                            <th scope="col" class="text-center"><i class="fas fa-thumbs-up"></i>
+                                            </th>
+                                            <th scope="col" class="text-center"><i class="fas fa-thumbs-up"></i> <i
+                                                    class="fas fa-thumbs-up"></i></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <template v-for="value in formattedSentiments(element.sentiments)">
+                                                <td v-if="value == _.max(formattedSentiments(element.sentiments))"
+                                                    class="text-success text-center"><b>{{ value }}</b>
+                                                </td>
+                                                <td v-else class="text-center">{{ value }}</td>
+                                            </template>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table class="table table-bordered">
+                                    <caption>Topic distribution for {{element.type}} {{ element.id }}.
+                                        Maximum
+                                        value is highlighted in green.</caption>
+                                    <thead>
+                                        <tr>
+                                            <template v-for="topicIndex in 10">
+                                                <th scope="col" class="text-center"><a href="" data-toggle="modal"
+                                                        :data-target="'#topic-'+topicIndex+'-definition-modal'">Topic
+                                                        {{ topicIndex }}</a></th>
+
+
+                                            </template>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <template v-for="value in formattedTopics(element.topics)">
+                                                <td v-if="value == _.max(formattedTopics(element.topics))"
+                                                    class="text-success text-center"><b>{{ value }}</b>
+                                                </td>
+                                                <td v-else class="text-center">{{ value }}</td>
+                                            </template>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                </div>
+                <br />
+                </template>
+
+                <hr />
+                <a name="questions"></a>
+                <div class="card">
+
+                    <div class="card-header"><b><i class="fas fa-question-circle"></i> Questions (towards next
+                            exploration iteration)</b></div>
+
+                    <div class="card-body">
+
+                        <div class="row">
+
+                            <div class="col-md-6">
+
+                                <form class="float-left">
+                                    <div class="form-group">
+                                        <label for="input_element"><i class="fas fa-location-arrow"></i> Which one
+                                            of the output elements do you choose as your next input element?</label>
+                                        <select class="form-control" id="input_element" name="input_element"
+                                            v-model="nextInputElement">
+                                            <option v-for="element in outputElements" :value="element">{{
+                                                element.type}} {{ element.id }}</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="target"><i class="fas fa-bullseye"></i> Have you found your
+                                            target? </label>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="terminate"
+                                                id="terminate1" :value="true" v-model="terminateSession">
+                                            <label class="form-check-label" for="terminate1">Yes (terminate the
+                                                session)</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="terminate"
+                                                id="terminate2" :value="false" v-model="terminateSession">
+                                            <label class="form-check-label" for="terminate2">No</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="output_element"><i class="fas fa-list-alt"></i> <b>Exploration
+                                                short list.</b> What is the most appealing aspect of the chosen
+                                            element?</label>
+                                        <select class="form-control" id="relevance_function" name="relevance_function"
+                                            v-model="nextRelevanceFunction">
+                                            <option value="sim"><b>REV-SIM</b> (The textual content of the element in
+                                                its entirety)</option>
+                                            <option value="tag_sim"><b>TAG-SIM</b> (Some important keywords in the
+                                                element)</option>
+                                            <option value="summary_sim"><b>SUMM-SIM</b> (The summary of the element)
+                                            </option>
+                                            <option value="sentiment_sim"><b>SENTI-SIM</b> (The sentiments of the
+                                                element)</option>
+                                            <option value="topic_sim"><b>TOPIC-SIM</b>(The topic distribution of the
+                                                element)</option>
+                                            <option value="attribute_sim"><b>ATTR-SIM</b>(The attributes of the
+                                                element)</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="quality_function"><i class="fas fa-directions"></i>
+                                            <b>Exploration objective.</b> How would you like to explore elements in
+                                            the next exploration iteration?</label>
+                                        <select class="form-control" id="quality_function" name="quality_function"
+                                            v-model="nextQualityFunction">
+                                            <option value="none"><b>NONE</b> (Show elements with the most appealing
+                                                aspect)</option>
+                                            <option value="diverse_numerical"><b>DIV-NUM</b> (Show elements with
+                                                diverse ratings)</option>
+                                            <option value="diverse_review"><b>DIV-REV</b> (Show elements with diverse
+                                                content)</option>
+                                            <option value="coverage_review"><b>COV</b> (Show elements which
+                                                collectively cover maximal information)</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- <div class="form-group">
+                                        <label for="element_type"><i class="fas fas fa-star-half-alt"></i>
+                                            <b>Element type.</b> Which type of elements (items or reviews) would you
+                                            like to see in
+                                            the next exploration iteration?</label>
+                                        <select class="form-control" id="element_type" name="element_type"
+                                            v-model="nextElementType">
+                                            <option value="item"><b>Items</b></option>
+                                            <option value="review"><b>Reviews</b></option>
+                                        </select>
+                                    </div> -->
+
+                                    <button type="submit" class="btn btn-primary" @click.prevent="executeNextStep">Next
+                                        exploration
+                                        iteration</button>
+                                    <a href="/" class="btn btn-danger" role="button" aria-pressed="true">Switch to
+                                        another session</a>
+
+                                </form>
+
+                            </div>
+
+                            <div class="col-md-6">
+                                <p><i class="fas fa-lightbulb"></i> For the next exploration iteration, we recommend
+                                    the following acctions to approach you towards the target.</p>
+                                <br />
+                                <p><i class="fas fa-list-alt"></i> <b>Recommendation for exploration short-list</b>
+                                </p>
+                                <p v-if="recommendations[1] == 'sim'"><input class="form-control" type="text"
+                                        placeholder="REV-SIM (The textual content of the element in its entirety)"
+                                        readonly></p>
+                                <p v-else-if="recommendations[1] == 'summary_sim'"><input class="form-control"
+                                        type="text" placeholder="SUMM-SIM (The summary of the element)" readonly></p>
+                                <p v-else-if="recommendations[1] == 'sentiment_sim'"><input class="form-control"
+                                        type="text" placeholder="SENTI-SIM (The sentiments of the element)" readonly>
+                                </p>
+                                <p v-else-if="recommendations[1] == 'tag_sim'"><input class="form-control" type="text"
+                                        placeholder="TAG-SIM (Some important keywords in the element)" readonly></p>
+                                <p v-else-if="recommendations[1] == 'topic_sim'"><input class="form-control" type="text"
+                                        placeholder="TOPIC-SIM (The topic distribution of the element)" readonly></p>
+                                <p v-else-if="recommendations[1] == 'attribute_sim'"><input class="form-control"
+                                        type="text" placeholder="ATTR-SIM (The attributes of the element)" readonly></p>
+                                <br>
+                                <p><i class="fas fa-list-alt"></i> <b>Recommendation for exploration objective</b>
+                                </p>
+
+                                <p v-if="recommendations[0] == 'none'"><input class=" form-control" type="text"
+                                        placeholder="NO-OPTIM (Show elements with the most appealing aspect)" readonly>
+                                </p>
+                                <p v-else-if="recommendations[0] == 'diverse_numerical'"><input class="form-control"
+                                        type="text" placeholder="DIV-NUM (Show elements with diverse ratings)" readonly>
+                                </p>
+                                <p v-else-if="recommendations[0] == 'diverse_review'"><input class="form-control"
+                                        type="text" placeholder="DIV-REV (Show elements with diverse content)" readonly>
+                                </p>
+                                <p v-else-if="recommendations[0] == 'coverage_review'"><input class="form-control"
+                                        type="text"
+                                        placeholder="COV (Show elements which collectively cover maximal information)"
+                                        readonly></p>
+                                <br>
+                                <p><a href="">Why are the above actions recommended?</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <script src="exploration.js" type="module"></script>
+</body>
+
+</html>

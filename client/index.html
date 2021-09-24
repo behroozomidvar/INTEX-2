@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<!-- saved from url=(0049)https://getbootstrap.com/docs/4.0/examples/album/ -->
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="Behrooz Omidvar-Tehrani">
+  <link rel="icon" href="https://getbootstrap.com/docs/4.0/assets/img/favicons/favicon.ico">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
+    integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+
+  <title>INTEX Review Exploration</title>
+
+  <link rel="canonical" href="https://getbootstrap.com/docs/4.0/examples/album/">
+
+  <!-- Bootstrap core CSS -->
+  <link href="./css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="./css/album.css" rel="stylesheet">
+</head>
+
+<body>
+
+  <main role="main">
+
+    <section class="jumbotron">
+      <div class="container">
+        <h1 class="jumbotron-heading text-center"><i class="fas fa-directions"></i></h1>
+        <h1 class="jumbotron-heading text-center">Start exploration with INTEX</h1>
+        <p class="lead text-muted text-center">Provide the following information to start.</p>
+
+
+        <div class="card">
+
+          <div class="card-body">
+
+            <form class="float-left" action="exploration.html" method="get">
+              <div class="form-group">
+                <label for="dataset_name">Select the dataset to explore.</label>
+                <select class="form-control" id="dataset_name" name="dataset_name">
+                  <option value="imdb" selected="true">movies</option>
+                  <option value="amazon">electronic retail</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="session_name">Enter a name for the exploration session.</label>
+                <input name="session_name" type="text" class="form-control" id="session_name"
+                  aria-describedby="session_name_help" placeholder="Name for the exploration session">
+                <small id="session_name_help" class="form-text text-muted">You may enter a new name or the name of a
+                  previously started session to continue the exploration.</small>
+              </div>
+
+              <div class="form-group">
+                <label for="keywords">Enter a few keywords to kickoff the exploration.</label>
+                <input name="keywords" type="text" class="form-control" id="keywords" aria-describedby="keywords_help"
+                  placeholder="Keywords separated by space">
+                <small id="session_name_help" class="form-text text-muted">It can remain blank to start the exploration
+                  randomly.</small>
+              </div>
+
+
+              <button type="submit" class="btn btn-primary">Start exploration</button>
+              <a href="about.html" class="btn btn-info" role="button" aria-pressed="true">About</a>
+
+            </form>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</body>
+
+</html>
